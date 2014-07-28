@@ -179,7 +179,14 @@ LIFE.Heart.model = {
 				}
 				userDefinedSuccess(userCreatedModel, rawData, status, jqxhr);
 			});
-			$.ajax(attributes);
+			if(userCreatedModel.settings.repeat) {
+				window.setInterval(function() {
+					$.ajax(attributes);
+				},userCreatedModel.settings.interval);
+			} else {
+				$.ajax(attributes);
+			}
+			
 		});
 		return userCreatedModel;
 	}
