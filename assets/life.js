@@ -194,7 +194,7 @@ LIFE.Heart.model = {
 
 	//this method calles the jquery ajax method
 	callAjax : function(attributes, userCreatedModel) {
-		userCreatedModel.lastAjaxCallTime = (new Date()).getTime();console.log(userCreatedModel.lastAjaxCallTime);
+		userCreatedModel.lastAjaxCallTime = (new Date()).getTime();//storing the last ajax call time
 		$.ajax(attributes);
 	},
 
