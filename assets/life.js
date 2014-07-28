@@ -20,18 +20,21 @@ var requirejs,require,define;(function(ba){function G(e){return"[object Function
 
 
 //////////////////////////// LIFE JS 0.0.1 /////////////////////////
-var LIFE        = {};
-LIFE.Model      = {};
-LIFE.View       = {};
-LIFE.Controller = {};
-LIFE.Heart      = {};//this is the Heart of the framework containing core functionalities.
-
+var LIFE              = {};
+LIFE.Model            = {};
+LIFE.View             = {};
+LIFE.Controller       = {};
+LIFE.Heart            = {};//this is the Heart of the framework containing core functionalities.
+LIFE.ActiveModels     = [];//holds the list og active models
+LIFE.ActiveViews      = [];//holds the list of active views
+LIFE.ActiveController = [];//holds the list of active controllers
 /////////////////// resources /////////////////////////////////////
 LIFE.Model.errorMessages = {
 	undefinedModelData : "Undefined data provided for model",
 	typeError          : "type should be",
 	dataNotFound       : "Specified content not found",
 	badKeyProvided     : "The provided key is invalid",
+	badURLProvided     : "The provided url is wrong"
 };
 /////////////////// resources /////////////////////////////////////
 
@@ -104,15 +107,12 @@ LIFE.Heart.model = {
 		return userCreatedModel;
 	},
 	
-	setUpOnChangeMethod : function(userCreatedModel) {
-		userCreatedModel.onchange = (function(viewsArray) {
-			for(var index in viewsArray) {
-				if(typeof viewsArray[index] != "udefined" && typeof viewsArray[index].render != "udefined") {
-					viewsArray[index].render();
-				}
+	changeViews : function(viewsArray) {alert("x");
+		for(var index in viewsArray) {
+			if(typeof viewsArray[index] != "udefined" && typeof viewsArray[index].render != "udefined") {
+				viewsArray[index].render();
 			}
-		});
-		return userCreatedModel;
+		}
 	},
 
 	// this method attach the get method to user model get method returns the specified value from model data
@@ -127,7 +127,7 @@ LIFE.Heart.model = {
 		return userCreatedModel;
 	},
 	
-	//this method attach the set method to the user model, this method set given value to defined key
+	//this method attach the set method to the user created model, this method set given value to defined key
 	setUpSetMethod : function(userCreatedModel) {
 		userCreatedModel.set = (function(key, value) {
 			if(typeof key == "undefined" || key == "" || key == null || key[0] == " ") {
@@ -135,10 +135,36 @@ LIFE.Heart.model = {
 				return false;
 			} else {
 				userCreatedModel.data[key] = value;
+				if(userCreatedModel.change.length = 0) {//calling the change views method for updating the views
+					this.changeViews(userCreatedModel.change);
+				}
 			}
 		});
 		return userCreatedModel;
 	},
+
+	//this method attach the fetch method to the user created model, fetch is used for any type of ajax calling
+	setUpFetchMethod : function(userCreatedModel) {
+		userCreatedModel.fetch = (function(attributes) {
+			var url;
+			if(typeof attributes.url != "undefined" && attributes.url != "") {
+				url = attributes.url;
+			} else {
+				if(typeof userCreatedModel.url != "undefined" && userCreatedModel.url != "") {
+					url = userCreatedModel.url;
+				} else {
+					console.log(LIFE.Model.errorMessages.badURLProvided);
+					return false;
+				}
+			}
+			if(url/indexOf(' ') != -1) {
+				console.log(LIFE.Model.errorMessages.badURLProvided);
+				return false;
+			} else {
+				
+			}
+		});
+	}
 
 };
 
@@ -156,14 +182,14 @@ LIFE.Model.inherit = (function(userCreatedModel) {//this function will merge the
 	//settingup change attribute of userdefined model
 	userCreatedModel = LIFE.Heart.model.checkAndSetupChangeAttribute(userCreatedModel);
 
-	//settng up change method of user defined model
-	userCreatedModel = LIFE.Heart.model.setUpOnChangeMethod(userCreatedModel);
-
 	//setting up get method for user defined model
 	userCreatedModel = LIFE.Heart.model.setUpGetMethod(userCreatedModel);
 
 	//setting up set method for user defined model
-	userCreatedModel = LIFE.Heart.model.setUpSetMethod(userCreatedModel);	
+	userCreatedModel = LIFE.Heart.model.setUpSetMethod(userCreatedModel);
+
+	//setting up the fetch method for user defined model
+	userCreatedModel = LIFE.Heart.model.setUpFetchMethod(userCreatedModel);	
 	
 	return userCreatedModel;
 });
