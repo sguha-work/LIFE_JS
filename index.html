@@ -2,19 +2,24 @@
 	<head>
 		<script type="text/javascript" src="assets/life.js"></script>
 		<script type="text/javascript">
-		var sampleModel = LIFE.Model.inherit({
+		// var sampleModel = LIFE.Model.inherit({
+		// 	url : "http://api.openweathermap.org/data/2.5/forecast/daily?q=Delhi&cnt=14&APPID=b35e5e51128992747a9393ab8ba53b8b",
+		// 	getData : function() {
+		// 		alert(this.url)
+		// 	}
+		// });
+		// sampleModel.getData();
+		var sampleModel2 = LIFE.Model.inherit({
 			url : "http://api.openweathermap.org/data/2.5/forecast/daily?q=Delhi&cnt=14&APPID=b35e5e51128992747a9393ab8ba53b8b",
 			getData : function() {
-				alert(this.url)
+				this.ajax({
+					success : function(model, rawData) {
+						console.log(model);
+					}
+				});
 			}
 		});
-		sampleModel.getData();
-		var sampleModel2 = LIFE.Model.inherit({
-			url : "google.com",
-			getData : function() {
-				alert(this.url)
-			}
-		});
+		console.log(sampleModel2);
 		sampleModel2.getData();
 		</script> 
 	</head>

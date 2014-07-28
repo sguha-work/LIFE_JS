@@ -34,7 +34,8 @@ LIFE.Model.errorMessages = {
 	typeError          : "type should be",
 	dataNotFound       : "Specified content not found",
 	badKeyProvided     : "The provided key is invalid",
-	badURLProvided     : "The provided url is wrong"
+	badURLProvided     : "The provided url is wrong",
+	badCallBack        : "Type of callback should be function"
 };
 /////////////////// resources /////////////////////////////////////
 
@@ -99,6 +100,19 @@ LIFE.Heart.model = {
 		return userCreatedModel;
 	},
 
+	//this function checks and setup the url attribute of user created model
+	checkAndSetupUrlAttribute : function(userCreatedModel) {
+		if(typeof userCreatedModel.url == "undefined") {
+			userCreatedModel.url = LIFE.Model.url;
+		} else {
+			if(userCreatedModel.url.indexOf(' ') != -1) {
+				console.log(LIFE.Model.errorMessages.badURLProvided);
+				return false;
+			}
+		}
+		return userCreatedModel;
+	},
+
 	//setting up the change attribute of user created model, this wii hold the list of views which will be refreshed on model change
 	checkAndSetupChangeAttribute : function(userCreatedModel) {
 		if(typeof userCreatedModel.change == "undefined") {
@@ -135,7 +149,7 @@ LIFE.Heart.model = {
 				return false;
 			} else {
 				userCreatedModel.data[key] = value;
-				if(userCreatedModel.change.length = 0) {//calling the change views method for updating the views
+				if(userCreatedModel.change.length > 0) {//calling the change views method for updating the views
 					this.changeViews(userCreatedModel.change);
 				}
 			}
@@ -144,26 +158,30 @@ LIFE.Heart.model = {
 	},
 
 	//this method attach the fetch method to the user created model, fetch is used for any type of ajax calling
-	setUpFetchMethod : function(userCreatedModel) {
-		userCreatedModel.fetch = (function(attributes) {
-			var url;
-			if(typeof attributes.url != "undefined" && attributes.url != "") {
-				url = attributes.url;
-			} else {
-				if(typeof userCreatedModel.url != "undefined" && userCreatedModel.url != "") {
-					url = userCreatedModel.url;
-				} else {
-					console.log(LIFE.Model.errorMessages.badURLProvided);
+	setUpAjaxMethod : function(userCreatedModel) {
+		var selfObject = this;
+		userCreatedModel.ajax = (function(attributes) {
+			if(typeof attributes.url == "undefined") {
+				attributes.url = userCreatedModel.url;
+			}
+			var userDefinedSuccess = (function(model, rawData, status, jqxhr) {});
+			if(typeof attributes.success != "undefined") {
+				if(typeof attributes.success != "function") {
+					console.log(LIFE.Model.errorMessages.badCallBack);
 					return false;
 				}
+				userDefinedSuccess = attributes.success;
 			}
-			if(url/indexOf(' ') != -1) {
-				console.log(LIFE.Model.errorMessages.badURLProvided);
-				return false;
-			} else {
-				
-			}
+			attributes.success = (function(rawData, status, jqxhr) {//defininf framework's ajax method
+				userCreatedModel.data = rawData;
+				if(userCreatedModel.change.length > 0) {// changing the views as model changed
+					selfObject.changeViews();
+				}
+				userDefinedSuccess(userCreatedModel, rawData, status, jqxhr);
+			});
+			$.ajax(attributes);
 		});
+		return userCreatedModel;
 	}
 
 };
@@ -179,6 +197,9 @@ LIFE.Model.inherit = (function(userCreatedModel) {//this function will merge the
 	//setting up model settings data
 	userCreatedModel = LIFE.Heart.model.checkAndSetupModelSettingsData(userCreatedModel);
 	
+	//setting up url attribute of userdefined model
+	userCreatedModel = LIFE.Heart.model.checkAndSetupUrlAttribute(userCreatedModel);
+	
 	//settingup change attribute of userdefined model
 	userCreatedModel = LIFE.Heart.model.checkAndSetupChangeAttribute(userCreatedModel);
 
@@ -189,7 +210,7 @@ LIFE.Model.inherit = (function(userCreatedModel) {//this function will merge the
 	userCreatedModel = LIFE.Heart.model.setUpSetMethod(userCreatedModel);
 
 	//setting up the fetch method for user defined model
-	userCreatedModel = LIFE.Heart.model.setUpFetchMethod(userCreatedModel);	
+	userCreatedModel = LIFE.Heart.model.setUpAjaxMethod(userCreatedModel);	
 	
 	return userCreatedModel;
 });
