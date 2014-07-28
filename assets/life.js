@@ -30,12 +30,12 @@ LIFE.ActiveViews      = [];//holds the list of active views
 LIFE.ActiveController = [];//holds the list of active controllers
 /////////////////// resources /////////////////////////////////////
 LIFE.Model.errorMessages = {
-	undefinedModelData : "Undefined data provided for model",
-	typeError          : "type should be",
-	dataNotFound       : "Specified content not found",
-	badKeyProvided     : "The provided key is invalid",
-	badURLProvided     : "The provided url is wrong",
-	badCallBack        : "Type of callback should be function"
+	undefinedModelData : "Undefined data provided for model ",
+	typeError          : "type should be ",
+	dataNotFound       : "Specified content not found ",
+	badKeyProvided     : "The provided key is invalid ",
+	badURLProvided     : "The provided url is wrong ",
+	badCallBack        : "Type of callback should be function "
 };
 /////////////////// resources /////////////////////////////////////
 
@@ -65,7 +65,7 @@ LIFE.Heart.model = {
 		userCreatedModel.settings = LIFE.Model.settings; 		
 		} else { //If user provide settings data checking wheather those are valid or not
 			if(typeof userCreatedModel.settings.cache != "undefined") {
-				if(!userCreatedModel.settings.cache instanceof Boolean) {
+				if(typeof userCreatedModel.settings.cache != "boolean") {
 					console.log("cache's " + LIFE.Model.errorMessages.typeError + "Boolean");
 					return false;	
 				}
@@ -73,7 +73,7 @@ LIFE.Heart.model = {
 				userCreatedModel.settings.cache = LIFE.Model.settings.cache;
 			}
 			if(typeof userCreatedModel.settings.cacheTimeOut != "undefined") {
-				if(!userCreatedModel.settings.cacheTimeOut instanceof Number) {
+				if(typeof userCreatedModel.settings.cacheTimeOut != "number") {
 					console.log("cacheTimeOut's " + LIFE.Model.errorMessages.typeError + "Number");
 					return false;	
 				}
@@ -81,7 +81,7 @@ LIFE.Heart.model = {
 				userCreatedModel.settings.cacheTimeOut = LIFE.Model.settings.cacheTimeOut;
 			}
 			if(typeof userCreatedModel.settings.repeat != "undefined") {
-				if(!userCreatedModel.settings.repeat instanceof Boolean) {
+				if(typeof userCreatedModel.settings.repeat != "boolean") {
 					console.log("repeat's " + LIFE.Model.errorMessages.typeError + "Boolean");	
 					return false;
 				}	
@@ -89,7 +89,7 @@ LIFE.Heart.model = {
 				userCreatedModel.settings.repeat = LIFE.Model.settings.repeat;
 			}
 			if(typeof userCreatedModel.settings.interval != "undefined") {
-				if(!userCreatedModel.settings.interval instanceof Number) {
+				if(typeof userCreatedModel.settings.interval != "number") {
 					console.log("interval's " + LIFE.Model.errorMessages.typeError + "Number");
 					return false;	
 				}
