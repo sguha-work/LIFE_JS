@@ -53,7 +53,8 @@ LIFE.Model.settings.cache = false;//if cache is true, data from api will be cach
 LIFE.Model.settings.cacheTimeOut = 60*1000;//after timeout the cache data will be refreshed by api call
 LIFE.Model.settings.repeat = false;//if repeat is true the api will be hitted after interval again and again
 LIFE.Model.settings.interval = 1000;
-LIFE.Model.change = [];
+LIFE.Model.change = []; //holds the list of views to be refreshed on model change default empty array
+LIFE.Model.lastAjaxCallTime = 0; // holds the last ajax call time, default 0;
 ////end properties/////
 
 LIFE.Heart.model = {
@@ -181,15 +182,21 @@ LIFE.Heart.model = {
 			});
 			if(userCreatedModel.settings.repeat) {
 				window.setInterval(function() {
-					$.ajax(attributes);
+					selfObject.callAjax(attributes, userCreatedModel);
 				},userCreatedModel.settings.interval);
 			} else {
-				$.ajax(attributes);
+				selfObject.callAjax(attributes, userCreatedModel);
 			}
 			
 		});
 		return userCreatedModel;
-	}
+	},
+
+	//this method calles the jquery ajax method
+	callAjax : function(attributes, userCreatedModel) {
+		userCreatedModel.lastAjaxCallTime = (new Date()).getTime();console.log(userCreatedModel.lastAjaxCallTime);
+		$.ajax(attributes);
+	},
 
 };
 
@@ -216,7 +223,10 @@ LIFE.Model.inherit = (function(userCreatedModel) {//this function will merge the
 	//setting up set method for user defined model
 	userCreatedModel = LIFE.Heart.model.setUpSetMethod(userCreatedModel);
 
-	//setting up the fetch method for user defined model
+	//setting up the last ajax call time for userdefined model
+	userCreatedModel.lastAjaxCallTime = LIFE.Model.lastAjaxCallTime;
+
+	//setting up the ajax method for user defined model
 	userCreatedModel = LIFE.Heart.model.setUpAjaxMethod(userCreatedModel);	
 	
 	return userCreatedModel;
