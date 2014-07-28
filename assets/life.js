@@ -121,7 +121,7 @@ LIFE.Heart.model = {
 		return userCreatedModel;
 	},
 	
-	changeViews : function(viewsArray) {alert("x");
+	changeViews : function(viewsArray) {
 		for(var index in viewsArray) {
 			if(typeof viewsArray[index] != "udefined" && typeof viewsArray[index].render != "udefined") {
 				viewsArray[index].render();
@@ -135,7 +135,7 @@ LIFE.Heart.model = {
 			if(typeof userCreatedModel.data[key] == "undefined") {
 				console.log(LIFE.Model.errorMessages.dataNotFound);
 			} else {
-				return userCreatedModel[key];
+				return userCreatedModel.data[key];
 			}
 		});
 		return userCreatedModel;
