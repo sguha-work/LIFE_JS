@@ -51,15 +51,16 @@ LIFE.Model.errorMessages = {
 /////////////////// model functionality begins ////////////////////
 
 ////properties/////
-LIFE.Model.url = "";//holds the url to be hitted with ajax
-LIFE.Model.settings = {};//holds the settings data
-LIFE.Model.data = {}; //holds data which are being stored in model
-LIFE.Model.settings.cache = false;//if cache is true, data from api will be cached
+LIFE.Model.url                   = "";//holds the url to be hitted with ajax
+LIFE.Model.settings              = {};//holds the settings data
+LIFE.Model.data                  = {}; //holds data which are being stored in model
+LIFE.Model.settings.cache        = false;//if cache is true, data from api will be cached
 LIFE.Model.settings.cacheTimeOut = 60*1000;//after timeout the cache data will be refreshed by api call
-LIFE.Model.settings.repeat = false;//if repeat is true the api will be hitted after interval again and again
-LIFE.Model.settings.interval = 1000;
-LIFE.Model.change = []; //holds the list of views to be refreshed on model change default empty array
-LIFE.Model.lastAjaxCallTime = 0; // holds the last ajax call time, default 0;
+LIFE.Model.settings.repeat       = false;//if repeat is true the api will be hitted after interval again and again
+LIFE.Model.settings.interval     = 1000;
+LIFE.Model.change                = []; //holds the list of views to be refreshed on model change default empty array
+LIFE.Model.onchange              = [];//hods the list of functions which will be called as soon as model's data changes
+LIFE.Model.lastAjaxCallTime      = 0; // holds the last ajax call time, default 0;
 ////end properties/////
 
 LIFE.Heart.model = {
@@ -126,11 +127,29 @@ LIFE.Heart.model = {
 		}
 		return userCreatedModel;
 	},
+
+	//setting up the onChange attribute for user created model this list will hold the functions list which will be called on change of model data
+	checkAndSetupOnChangeAttribute : function(userCreatedModel) {
+		if(typeof userCreatedModel.onchange == "undefined") {
+			userCreatedModel.onchange = LIFE.Model.onchange;
+		}
+		return userCreatedModel;	
+	},
 	
+	//this function is responsible for calling the render functions of specified view as the model changes
 	changeViews : function(viewsArray) {
 		for(var index in viewsArray) {
 			if(typeof viewsArray[index] != "udefined" && typeof viewsArray[index].render != "udefined") {
 				viewsArray[index].render();
+			}
+		}
+	},
+
+	//this function is responsible for calling the controller functions specified as model changes occur
+	callControllerMethods : function(methodArray) {
+		for(var index in methodArray) {
+			if(typeof methodArray[index] != "udefined" && typeof methodArray[index] == "function") {
+				methodArray[index]();
 			}
 		}
 	},
@@ -157,6 +176,9 @@ LIFE.Heart.model = {
 				userCreatedModel.data[key] = value;
 				if(userCreatedModel.change.length > 0) {//calling the change views method for updating the views
 					this.changeViews(userCreatedModel.change);
+				}
+				if(userCreatedModel.onchange.length>0) {//calling the controller methods on change of model
+					this.callControllerMethods(userCreatedModel.onchange);
 				}
 			}
 		});
@@ -221,6 +243,9 @@ LIFE.Model.inherit = (function(userCreatedModel) {//this function will merge the
 	
 	//settingup change attribute of userdefined model
 	userCreatedModel = LIFE.Heart.model.checkAndSetupChangeAttribute(userCreatedModel);
+
+	//settingup onchange attribute of userdefined model
+	userCreatedModel = LIFE.Heart.model.checkAndSetupOnChangeAttribute(userCreatedModel);
 
 	//setting up get method for user defined model
 	userCreatedModel = LIFE.Heart.model.setUpGetMethod(userCreatedModel);
