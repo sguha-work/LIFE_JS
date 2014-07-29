@@ -20,11 +20,12 @@
 					url : "http://api.openweathermap.org/data/2.5/forecast/daily?q=Delhi&cnt=14&APPID=b35e5e51128992747a9393ab8ba53b8b",
 					success : function(model, rawData) {
 						console.log(model.get('message'));
+						model.fireEvent("data received");		
 					}
 				});
 			}
 		});
-		//console.log(sampleModel2);
+		// console.log(sampleModel2);
 		sampleModel2.getData();
 		</script> 
 	</head>
