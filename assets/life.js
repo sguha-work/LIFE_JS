@@ -135,6 +135,16 @@ LIFE.Heart.model = {
 		}
 		return userCreatedModel;	
 	},
+
+	//this method setup the fireEvent method of user defined model which will be used to fire a custom event from model
+	setUpFireEventMethod : function(userCreatedModel) {
+		userCreatedModel.fireEvent = (function(eventName) {
+			if(typeof eventName != "undefined" && typeof eventName == "string" && eventName != "") {
+				$(userCreatedModel).trigger(eventName);
+			}
+		});
+		return userCreatedModel;
+	},
 	
 	//this function is responsible for calling the render functions of specified view as the model changes
 	changeViews : function(viewsArray) {
@@ -246,6 +256,9 @@ LIFE.Model.inherit = (function(userCreatedModel) {//this function will merge the
 
 	//settingup onchange attribute of userdefined model
 	userCreatedModel = LIFE.Heart.model.checkAndSetupOnChangeAttribute(userCreatedModel);
+
+	//setting up the fireevent method of userdefined model
+	userCreatedModel = LIFE.Heart.model.setUpFireEventMethod(userCreatedModel);
 
 	//setting up get method for user defined model
 	userCreatedModel = LIFE.Heart.model.setUpGetMethod(userCreatedModel);
