@@ -28,6 +28,7 @@ var requirejs,require,define;(function(ba){function G(e){return"[object Function
 var LIFE              = {};
 LIFE.Model            = {};
 LIFE.View             = {};
+LIFE.Router           = {};
 LIFE.Controller       = {};
 LIFE.Heart            = {};//this is the Heart of the framework containing core functionalities.
 LIFE.ActiveModels     = [];//holds the list og active models
@@ -41,6 +42,9 @@ LIFE.Model.errorMessages = {
 	badKeyProvided     : "The provided key is invalid ",
 	badURLProvided     : "The provided url is wrong ",
 	badCallBack        : "Type of callback should be function "
+};
+LIFE.Router.errorMessages = {
+	invalidRouteProvided : "The provided route is invalid",
 };
 /////////////////// resources /////////////////////////////////////
 
@@ -231,6 +235,7 @@ LIFE.Heart.model = {
 
 	//this method calles the jquery ajax method
 	callAjax : function(attributes, userCreatedModel) {
+		//if(userCreatedModel.settings.cache && userCreatedModel.settings.cacheTimeOut>((new Date()).getTime()-userCreatedModel.lastAjaxCallTime))
 		userCreatedModel.lastAjaxCallTime = (new Date()).getTime();//storing the last ajax call time
 		$.ajax(attributes);
 	},
@@ -275,3 +280,53 @@ LIFE.Model.inherit = (function(userCreatedModel) {//this function will merge the
 	return userCreatedModel;
 });
 /////////////////// model functionality ends /////////////////////
+
+
+////////////////// router functionality bgins ///////////////////
+
+/////// properties //////////
+LIFE.Router.routes = [];//default empty array an array holding objects which holds routes as key and controller/fuction as value
+LIFE.Router.fileLocation = "";//default empty string, holds the file path where the file resides
+/////// end properties //////////
+
+LIFE.Heart.router = {
+	checkRoutes : function(routes, userCreatedRouter) {
+		var entries = Object.keys(routes);
+		for(var index in entries) {
+			if(this.checkForValidRoute(entries[i])) {
+				var controllerAction = routes[entries[i]];
+				var controllerActionArray = controllerAction.split(".");
+				var controller = controllerActionArray[0]
+				this.checkControllerExistsOrFetchFile(controller, userCreatedRouter);
+			} else {
+				return false;
+			}
+		}
+	},
+	checkControllerExistsOrFetchFile : function(controller, userCreatedRouter) {
+		if(typeof controller == "undefined") {
+			require([userCreatedRouter.fileLocation + ])
+		}
+	},
+	checkForValidRoute : function(route) {
+		if(route.indexOf(" ") != -1) {
+			console.log(LIFE.Router.errorMessages.invalidRouteProvided);
+			return false;
+		}
+		return true;
+	}
+};
+
+LIFE.Router.inherit = (function(userCreatedRouter) {
+	if(typeof userCreatedRouter.fileLocation == "undefined") {
+		userCreatedRouter.fileLocation = LIFE.Router.fileLocation;
+	}
+	if(typeof userCreatedRouter.routes == "undefined") {
+		userCreatedRouter.routes = LIFE.Router.routes; 	
+	} else {
+		LIFE.Heart.router.checkRoutes(userCreatedRouter.routes, userCreatedRouter);
+	}
+	return userCreatedRouter;
+	
+});
+////////////////// router functionality ends ///////////////////
